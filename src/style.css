@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Nunito:wght@400;500;600;700;800;900&family=Patrick+Hand&display=swap');
+
+:root {
+  font-family: 'Nunito', 'Trebuchet MS', sans-serif;
+  color: #39556a;
+  background: #b9e5fb;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --ink: #425b6b;
+  --muted-ink: #859ca8;
+  --paper: #fffaf0;
+  --pink: #f4bdd0;
+  --blue: #93cee9;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #game { width: 100%; height: 100%; min-height: 100%; margin: 0; overflow: hidden; }
+body { user-select: none; }
+button, a { font: inherit; }
+button { color: inherit; }
+#game { position: relative; isolation: isolate; background: linear-gradient(#a8dcf7, #e0f4fa 66%, #cae9f5); cursor: grab; }
+#game.dragging { cursor: grabbing; }
+.game-canvas { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; display: block; image-rendering: auto; cursor: grab; touch-action: none; }
+.game-canvas.dragging { cursor: grabbing; }
+.sky-grain { position: absolute; z-index: -1; inset: 0; pointer-events: none; opacity: .14; background-image: radial-gradient(#fff 0.7px, transparent .7px); background-size: 7px 7px; mix-blend-mode: screen; }
+
+.topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 2; height: 82px; padding: 0 5.2%; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; }
+#game.paused .topbar { z-index: 5; }
+.brand { justify-self: start; color: #446578; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; font-weight: 900; font-size: 15px; }
+.brand-mark { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 10px; background: rgba(255, 250, 240, .8); color: #eb9eb6; font-size: 19px; box-shadow: 0 2px 0 rgba(89, 132, 155, .12); }
+.hud { justify-self: center; min-width: 120px; height: 38px; border: 1px solid rgba(255, 255, 255, .69); border-radius: 14px; padding: 0 14px; display: flex; align-items: center; justify-content: center; gap: 9px; background: rgba(250, 253, 251, .58); color: #557383; font-size: 13px; font-weight: 800; backdrop-filter: blur(8px); }
+.hud-star { color: #eebd65; font-size: 17px; }
+.hud-divider { width: 1px; height: 16px; margin: 0 3px; background: #d4e3df; }
+.page-count { font-family: 'DM Mono', monospace; font-size: 11px; }
+.page-count > span { color: #9bb0b2; }
+.journal-button { justify-self: end; position: relative; min-height: 38px; border: 1px solid rgba(255,255,255,.74); border-radius: 12px; padding: 0 13px; display: flex; align-items: center; gap: 8px; background: rgba(255,250,240,.7); color: #567182; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 rgba(86,129,150,.09); transition: transform .18s, background .18s; }
+.journal-button:hover { transform: translateY(-2px); background: #fffaf0; }
+.journal-button > span:first-child { font-size: 17px; color: #d68ca9; }
+.top-actions { justify-self: end; display: flex; align-items: center; gap: 7px; }
+.icon-button { position: relative; width: 38px; min-width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.74); border-radius: 12px; display: grid; place-items: center; color: #567182; background: rgba(255,250,240,.7); box-shadow: 0 3px 0 rgba(86,129,150,.09); font-size: 17px; font-weight: 800; cursor: pointer; transition: transform .18s, background .18s; }
+.icon-button:hover:not(:disabled) { transform: translateY(-2px); background: #fffaf0; }
+.icon-button:disabled { opacity: .48; cursor: default; }
+.sound-button.muted::after { position: absolute; width: 22px; height: 2px; border-radius: 2px; background: #d48da0; content: ''; transform: rotate(-48deg); }
+.journal-dot { display: none; width: 6px; height: 6px; border-radius: 50%; background: #efae66; }
+.journal-dot.visible { display: block; }
+.chapter-tag { position: absolute; top: 111px; left: 6.2%; color: rgba(64,101,121,.75); font-family: 'Patrick Hand', cursive; font-size: 16px; transform: rotate(-5deg); }
+.chapter-sparkle { color: #efa9bd; font-size: 19px; margin-right: 4px; }
+.ambient-label { position: absolute; top: 113px; right: 6%; display: flex; align-items: center; gap: 7px; color: rgba(72,112,129,.68); font-family: 'Patrick Hand', cursive; font-size: 14px; }
+.ambient-dot { height: 6px; width: 6px; border-radius: 50%; background: #b6d79c; box-shadow: 0 0 0 3px rgba(255,255,255,.28); }
+.youtube-player { position: fixed; top: 0; left: -10000px; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+.youtube-player iframe { display: block; width: 100%; height: 100%; border: 0; border-radius: 5px; }
+
+.screen-screen { position: absolute; z-index: 4; inset: 0; display: grid; place-items: center; padding: 90px 20px 50px; background: linear-gradient(180deg, rgba(232,248,251,.12), rgba(251,243,233,.14)); }
+.hidden { display: none !important; }
+.paper-card { position: relative; width: min(390px, calc(100vw - 36px)); padding: 36px 35px 29px; border: 1px solid #f4ead7; border-radius: 5px; background-color: var(--paper); background-image: repeating-linear-gradient(0deg, transparent 0 27px, rgba(154,191,198,.105) 27px 28px); box-shadow: 0 13px 0 rgba(99,148,167,.11), 0 25px 55px rgba(72,125,153,.2); text-align: center; transform: rotate(-1deg); animation: card-arrive .65s cubic-bezier(.2,.8,.25,1) both; }
+.title-card::before, .result-card::before { content: ''; position: absolute; width: 44px; height: 9px; top: -5px; left: calc(50% - 22px); background: rgba(237,205,173,.72); transform: rotate(-2deg); }
+@keyframes card-arrive { from { opacity: 0; transform: translateY(14px) rotate(-1deg) scale(.97); } to { opacity: 1; transform: translateY(0) rotate(-1deg) scale(1); } }
+.card-sticker { position: absolute; display: grid; place-items: center; }
+.sticker-flower { left: -13px; top: 20px; width: 38px; height: 38px; border: 2px dashed #fffaf0; border-radius: 50%; color: #e69db5; background: #f9d8df; font-size: 24px; transform: rotate(-13deg); }
+.sticker-star { right: 20px; top: 16px; color: #e7b968; font-size: 25px; transform: rotate(10deg); }
+.title-kicker { color: #a0a4a0; text-transform: uppercase; letter-spacing: .08em; font-family: 'DM Mono', monospace; font-size: 9px; }
+.title-kicker > span { color: #e5bd72; padding: 0 4px; }
+.title-card h1 { margin: 12px 0 2px; color: #55788b; font-size: clamp(43px, 11vw, 55px); font-weight: 900; line-height: .98; }
+.title-card h1 span { color: #df9caf; }
+.title-card > p, .result-card > p { margin: 12px 0 0; color: #879b9a; font-family: 'Patrick Hand', cursive; font-size: 18px; }
+.title-doodle { height: 46px; margin: 7px 0 12px; display: flex; justify-content: center; align-items: center; gap: 22px; color: #fff; font-size: 34px; text-shadow: 1px 2px 0 #c1dfea; }
+.title-doodle i { width: 57px; height: 8px; border-radius: 50%; background: #f2d9c1; box-shadow: 0 3px 0 #e8c4a9; }
+.primary-button { width: 100%; min-height: 47px; padding: 0 17px; border: 0; border-bottom: 3px solid #70acc7; border-radius: 11px; display: flex; justify-content: center; align-items: center; gap: 10px; color: white; background: #94cde4; font-size: 14px; font-weight: 900; cursor: pointer; transition: transform .15s, filter .15s, border-bottom-width .15s; }
+.primary-button:hover { transform: translateY(-2px); filter: brightness(1.035); }
+.primary-button:active { transform: translateY(1px); border-bottom-width: 1px; }
+.control-hint { display: block; margin-top: 13px; color: #a2aaa5; font-family: 'Patrick Hand', cursive; font-size: 13px; }
+kbd { margin-left: 3px; padding: 1px 4px; border: 1px solid #e9e4d8; border-radius: 4px; background: #fffdf7; color: #81969c; font: 10px 'DM Mono', monospace; }
+.hint-separator { margin: 0 7px; color: #d7b9a6; }
+.result-card { width: min(360px, calc(100vw - 36px)); padding-top: 29px; }
+.result-icon { display: grid; place-items: center; width: 58px; height: 58px; margin: 0 auto 8px; border: 1px dashed #e2c9a9; border-radius: 50%; color: #efb2c1; background: #fff5e6; font-size: 35px; }
+.result-card h2 { margin: 8px 0 0; color: #597b8b; font-size: 33px; font-weight: 900; }
+.result-card > p { margin: 3px 0 0; }
+.result-sparkles { height: 34px; padding-top: 5px; color: #e7be73; font-size: 18px; }
+.result-card .primary-button { margin-top: 9px; }
+.pause-card { width: min(330px, calc(100vw - 36px)); padding-top: 30px; }
+.pause-icon { display: grid; place-items: center; width: 54px; height: 50px; margin: 0 auto 5px; color: #fff; font-size: 40px; text-shadow: 2px 3px 0 #c7dfeb; }
+.pause-card h2 { margin: 8px 0 18px; color: #597b8b; font-size: 31px; font-weight: 900; }
+.pause-card .primary-button { margin-top: 5px; }
+.result-card.won .result-icon { color: #edae65; }
+.result-card.won h2 { color: #d7959c; font-size: 24px; }
+
+.footer-note { position: absolute; right: 5%; bottom: 24px; color: rgba(77,116,134,.62); font-family: 'Patrick Hand', cursive; font-size: 13px; }
+.footer-note span { margin: 0 5px; color: #e49fb3; }
+
+.journal-overlay { position: absolute; z-index: 6; inset: 0; display: grid; place-items: center; padding: 38px 18px; background: rgba(94,132,151,.27); backdrop-filter: blur(4px); animation: fade-in .2s ease-out; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.journal-book { position: relative; width: min(720px, 100%); max-height: 100%; padding: 8px; border: 1px solid rgba(255,255,255,.78); border-radius: 5px 13px 13px 5px; background: #d9bfa4; box-shadow: 0 20px 55px rgba(62,93,111,.28), inset 4px 0 0 rgba(133,99,75,.15); transform: rotate(-.4deg); }
+.journal-book::before { content: ''; position: absolute; top: 10px; bottom: 10px; left: 19px; width: 6px; border-radius: 6px; background: repeating-linear-gradient(to bottom, #b99b80 0 6px, transparent 6px 17px); }
+.journal-paper { position: relative; max-height: min(690px, calc(100dvh - 92px)); overflow: auto; padding: 28px 35px 18px 45px; border-radius: 3px 8px 8px 3px; background-color: #fffaf0; background-image: repeating-linear-gradient(0deg, transparent 0 31px, rgba(130,173,191,.16) 31px 32px), linear-gradient(90deg, transparent 0 32px, rgba(232,171,177,.22) 32px 33px, transparent 33px); scrollbar-color: #e6c6b9 transparent; scrollbar-width: thin; }
+.journal-heading { display: flex; justify-content: space-between; align-items: start; padding-bottom: 10px; border-bottom: 1px dashed #e6caba; }
+.eyebrow { margin: 0 0 3px; color: #b3a391; font: 9px 'DM Mono', monospace; letter-spacing: .1em; text-transform: uppercase; }
+.journal-heading h2 { margin: 0; color: #557487; font-family: 'Patrick Hand', cursive; font-size: clamp(27px, 6vw, 36px); font-weight: 400; }
+.journal-heading h2 span { color: #e5a4b6; font-family: 'Nunito', sans-serif; font-size: 21px; }
+.close-button { width: 32px; height: 32px; border: 1px solid #ead9c6; border-radius: 50%; color: #9b988b; background: #fffdf7; font-size: 23px; line-height: 1; cursor: pointer; }
+.close-button:hover { color: #d98ea4; background: #fff5ef; }
+.journal-note { margin: 10px 0 14px; color: #9b9d91; font-family: 'Patrick Hand', cursive; font-size: 16px; }
+.journal-note span { color: #e8a5b4; }
+.collection-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; }
+.collection-card { min-height: 154px; padding: 10px 9px 9px; border: 1px solid #eee3d1; border-radius: 7px; position: relative; background: rgba(255,255,255,.6); box-shadow: 0 3px 0 rgba(227,212,192,.3); text-align: center; }
+.collection-card:nth-child(3n + 1) { transform: rotate(-.6deg); }
+.collection-card:nth-child(3n + 2) { transform: rotate(.6deg); }
+.collection-illustration { width: 54px; height: 53px; margin: 0 auto 2px; display: grid; place-items: center; border-radius: 50%; background: #f8efdc; font-size: 31px; filter: saturate(.82); }
+.collection-card:nth-child(4n + 2) .collection-illustration { background: #f8e7e9; }
+.collection-card:nth-child(4n + 3) .collection-illustration { background: #e9f4f4; }
+.collection-card:nth-child(4n + 4) .collection-illustration { background: #f2effa; }
+.collection-name { margin: 5px 0 2px; color: #607a83; font-family: 'Patrick Hand', cursive; font-size: 17px; line-height: 1; }
+.collection-description { margin: 4px 0 0; color: #a3a196; font-family: 'Patrick Hand', cursive; font-size: 12px; line-height: 1.15; }
+.collection-check { position: absolute; top: 6px; right: 7px; width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: #b7d3a2; font: 10px 'Nunito', sans-serif; opacity: 0; transform: scale(.7); transition: opacity .2s, transform .2s; }
+.collection-card.discovered .collection-check { opacity: 1; transform: scale(1); }
+.collection-card:not(.discovered) .collection-illustration { filter: grayscale(.55) opacity(.58); }
+.journal-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 13px; padding-top: 10px; border-top: 1px dashed #e6caba; color: #b0a28f; font: 10px 'DM Mono', monospace; }
+.guide-book { width: min(900px, 100%); }
+.guide-paper { max-height: calc(100dvh - 70px); padding-right: 27px; }
+.guide-section { margin-top: 19px; }
+.guide-section > h3 { margin: 0 0 8px; color: #789299; font: 11px 'DM Mono', monospace; text-transform: uppercase; }
+.guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; }
+.guide-entry { min-width: 0; min-height: 66px; display: flex; align-items: center; gap: 11px; padding: 8px 5px; border-top: 1px dashed #e6ded0; }
+.guide-picture { flex: 0 0 42px; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; color: #708792; background: #edf4ed; font-size: 25px; }
+.guide-entry:nth-child(4n + 2) .guide-picture { background: #fae8eb; }
+.guide-entry:nth-child(4n + 3) .guide-picture { background: #e6f2f4; }
+.guide-entry:nth-child(4n + 4) .guide-picture { background: #f7eedb; }
+.guide-entry h4 { margin: 0; color: #587487; font-size: 13px; font-weight: 900; }
+.guide-entry p { margin: 2px 0 0; color: #909d99; font: 14px/1.25 'Patrick Hand', cursive; }
+.guide-collectibles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.guide-collectibles .guide-entry { align-items: flex-start; }
+.guide-collectibles .guide-picture { flex-basis: 38px; width: 38px; height: 38px; }
+.paper-tape { position: absolute; z-index: 1; width: 46px; height: 12px; top: 6px; background: rgba(236,206,169,.55); }
+.tape-left { left: 62px; transform: rotate(-9deg); }
+.tape-right { right: 28px; transform: rotate(7deg); }
+.toast { position: absolute; z-index: 5; bottom: 70px; left: 50%; padding: 9px 16px; border: 1px solid rgba(255,255,255,.75); border-radius: 20px; color: #587283; background: rgba(255,250,240,.92); font-family: 'Patrick Hand', cursive; font-size: 16px; opacity: 0; transform: translate(-50%, 8px); transition: opacity .2s, transform .2s; pointer-events: none; box-shadow: 0 4px 14px rgba(70,113,131,.1); }
+.toast.visible { opacity: 1; transform: translate(-50%, 0); }
+
+.touch-controls { display: none; position: absolute; z-index: 2; inset: auto 0 max(20px, env(safe-area-inset-bottom)) 0; height: 116px; padding: 0 22px; justify-content: space-between; align-items: end; pointer-events: none; }
+.touch-dpad { position: relative; width: 126px; height: 108px; pointer-events: auto; }
+.touch-key, .touch-jump { border: 1px solid rgba(255,255,255,.75); color: #65879a; background: rgba(255,250,240,.76); backdrop-filter: blur(4px); box-shadow: 0 3px 0 rgba(82,133,157,.14); touch-action: none; }
+.touch-key { position: absolute; width: 39px; height: 37px; border-radius: 11px; font-size: 21px; }
+.touch-up { left: 43px; top: 0; }.touch-left { left: 0; top: 39px; }.touch-down { left: 43px; top: 39px; }.touch-right { left: 86px; top: 39px; }
+.touch-key:active, .touch-jump:active { background: #f4dbe0; transform: translateY(2px); }
+.touch-jump { width: 68px; height: 68px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: auto; }
+.touch-jump > span { font-size: 25px; line-height: 1; }.touch-jump small { font: 8px 'DM Mono', monospace; }
+
+@media (max-width: 650px) {
+  .topbar { height: 68px; padding: 0 10px; }
+  .brand { gap: 6px; font-size: 13px; }.brand-mark { width: 25px; height: 25px; }
+  .hud { min-width: 89px; height: 34px; padding: 0 9px; gap: 6px; font-size: 12px; }
+  .top-actions { gap: 4px; }
+  .icon-button { width: 33px; min-width: 33px; height: 34px; border-radius: 10px; }
+  .journal-button { width: 38px; height: 36px; min-height: 36px; justify-content: center; padding: 0; font-size: 0; }
+  .journal-button > span:first-child { font-size: 18px; }.journal-dot { position: absolute; top: 5px; right: 4px; width: 5px; height: 5px; }
+  .chapter-tag { top: 81px; left: 19px; font-size: 14px; }.ambient-label { top: 82px; right: 17px; font-size: 12px; }
+  .footer-note { right: 50%; bottom: 145px; white-space: nowrap; transform: translateX(50%); font-size: 12px; }
+  .touch-controls { display: flex; }
+  .screen-screen { padding-top: 60px; padding-bottom: 140px; }
+  .paper-card { padding-right: 25px; padding-left: 25px; }
+  .journal-overlay { padding: 20px 10px; }.journal-paper { max-height: calc(100dvh - 54px); padding: 23px 14px 15px 35px; background-image: repeating-linear-gradient(0deg, transparent 0 31px, rgba(130,173,191,.16) 31px 32px), linear-gradient(90deg, transparent 0 25px, rgba(232,171,177,.22) 25px 26px, transparent 26px); }
+  .collection-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }.collection-card { min-height: 132px; }.collection-illustration { width: 46px; height: 46px; font-size: 28px; }
+  .journal-footer { font-size: 8px; }
+  .top-actions { gap: 3px; }
+  .icon-button { width: 30px; min-width: 30px; }
+  .guide-paper { max-height: calc(100dvh - 38px); padding: 21px 12px 15px 31px; }
+  .guide-grid, .guide-collectibles { grid-template-columns: minmax(0, 1fr); }
+  .guide-section { margin-top: 15px; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .touch-controls { display: flex; }
+  .footer-note { bottom: 143px; }
+}
+
+@media (max-height: 650px) and (min-width: 651px) {
+  .screen-screen { padding-top: 45px; padding-bottom: 35px; }
+  .paper-card { padding-top: 25px; padding-bottom: 19px; }.title-doodle { height: 33px; margin: 4px 0 8px; }
+  .journal-paper { max-height: calc(100dvh - 40px); padding-top: 19px; padding-bottom: 12px; }.collection-card { min-height: 129px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

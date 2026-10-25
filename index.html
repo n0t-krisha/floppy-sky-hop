@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#b9e5fb" />
+    <meta name="description" content="Hop through a dreamy pastel sky, collect little treasures, and fill your scrapbook in Sky Jumper." />
+    <title>Sky Jumper</title>
+  </head>
+  <body>
+    <main id="game" aria-label="Sky Jumper game">
+      <div class="sky-grain" aria-hidden="true"></div>
+      <canvas class="game-canvas" aria-label="A pixelated bunny hopping across clouds"></canvas>
+
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Sky Jumper home">
+          <span class="brand-mark" aria-hidden="true">✿</span>
+          <span>sky jumper</span>
+        </a>
+        <div class="hud" aria-live="polite">
+          <span class="hud-star" aria-hidden="true">✦</span>
+          <span id="star-count">0</span>
+          <span class="hud-divider"></span>
+          <span class="page-count" id="page-count">01 <span>/ 50</span></span>
+        </div>
+        <div class="top-actions">
+          <button class="icon-button" id="pause-toggle" type="button" disabled aria-label="Pause game" aria-pressed="false" title="Pause game"><span aria-hidden="true">Ⅱ</span></button>
+          <button class="icon-button" id="howto-open" type="button" aria-label="How to play" title="How to play"><span aria-hidden="true">?</span></button>
+          <button class="icon-button sound-button" id="sound-toggle" type="button" aria-label="Mute music and sound effects" aria-pressed="false" title="Mute music and sound effects"><span id="sound-icon" aria-hidden="true">♫</span></button>
+          <button class="journal-button" id="journal-open" type="button" aria-label="Open collection journal" title="Open collection journal">
+            <span aria-hidden="true">▤</span>
+            <span class="journal-button-label">journal</span>
+            <span class="journal-dot" id="journal-dot" aria-hidden="true"></span>
+          </button>
+        </div>
+      </header>
+
+      <div class="chapter-tag" aria-hidden="true"><span class="chapter-sparkle">✧</span> little cloud trail</div>
+      <div class="ambient-label" aria-hidden="true"><span class="ambient-dot"></span><span id="status-label">a lovely day for a hop</span></div>
+      <div class="youtube-player" id="music-player" aria-label="Background music player">
+        <iframe title="Sky Jumper background music" src="https://www.youtube-nocookie.com/embed/MgJve3aLsvk?enablejsapi=1&amp;autoplay=0&amp;controls=1&amp;loop=1&amp;playlist=MgJve3aLsvk&amp;playsinline=1&amp;rel=0" allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+
+      <div class="touch-controls" aria-label="Touch game controls">
+        <div class="touch-dpad">
+          <button class="touch-key touch-up" data-key="ArrowUp" aria-label="Move forward">↑</button>
+          <button class="touch-key touch-left" data-key="ArrowLeft" aria-label="Move left">←</button>
+          <button class="touch-key touch-down" data-key="ArrowDown" aria-label="Move backward">↓</button>
+          <button class="touch-key touch-right" data-key="ArrowRight" aria-label="Move right">→</button>
+        </div>
+        <button class="touch-jump" id="touch-jump" aria-label="Jump"><span aria-hidden="true">↑</span><small>JUMP</small></button>
+      </div>
+
+      <section class="screen-screen" id="title-screen" aria-labelledby="title-heading">
+        <div class="paper-card title-card">
+          <span class="card-sticker sticker-flower" aria-hidden="true">✿</span>
+          <span class="card-sticker sticker-star" aria-hidden="true">✧</span>
+          <div class="title-kicker"><span>✦</span> a tiny sky adventure <span>✦</span></div>
+          <h1 id="title-heading">Sky <span>Jumper</span></h1>
+          <p>One little bunny. A sky full of wishes.</p>
+          <div class="title-doodle" aria-hidden="true"><span>☁</span><i></i><span>☁</span></div>
+          <button class="primary-button" id="start-button" type="button"><span>start hopping</span><span aria-hidden="true">↗</span></button>
+          <span class="control-hint">move <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> <span class="hint-separator">·</span> hop <kbd>space</kbd> <span class="hint-separator">·</span> run <kbd>shift</kbd> <span class="hint-separator">·</span> drag to look</span>
+        </div>
+      </section>
+
+      <section class="screen-screen pause-screen hidden" id="pause-screen" aria-labelledby="pause-title" aria-modal="true" role="dialog">
+        <div class="paper-card pause-card">
+          <span class="pause-icon" aria-hidden="true">☁</span>
+          <div class="title-kicker">take a little breather</div>
+          <h2 id="pause-title">Paused</h2>
+          <button class="primary-button" id="pause-continue" type="button">Continue</button>
+        </div>
+      </section>
+
+      <section class="screen-screen hidden" id="result-screen" aria-live="assertive">
+        <div class="paper-card result-card" id="result-card">
+          <span class="result-icon" id="result-icon" aria-hidden="true">☁</span>
+          <span class="title-kicker" id="result-kicker">a little skyward detour</span>
+          <h2 id="result-title">oops!</h2>
+          <p id="result-copy">Bunny fell into the sky</p>
+          <div class="result-sparkles" aria-hidden="true">✧　✦　✧</div>
+          <button class="primary-button" id="retry-button" type="button"><span aria-hidden="true">↶</span><span id="retry-label">Try Again</span></button>
+        </div>
+      </section>
+
+      <section class="journal-overlay hidden" id="journal-screen" aria-labelledby="journal-title" aria-modal="true" role="dialog">
+        <div class="journal-book">
+          <div class="journal-paper">
+            <div class="journal-heading">
+              <div>
+                <p class="eyebrow">a little field guide</p>
+                <h2 id="journal-title">Sky scrapbook <span aria-hidden="true">✿</span></h2>
+              </div>
+              <button class="close-button" id="journal-close" type="button" aria-label="Close journal">×</button>
+            </div>
+            <p class="journal-note">Little things found along the way <span aria-hidden="true">♡</span></p>
+            <div class="collection-grid" id="collection-grid"></div>
+            <div class="journal-footer"><span>made among the clouds</span><span id="journal-progress">0 of 7 found　✧</span></div>
+            <span class="paper-tape tape-left" aria-hidden="true"></span>
+            <span class="paper-tape tape-right" aria-hidden="true"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="journal-overlay hidden" id="howto-screen" aria-labelledby="howto-title" aria-modal="true" role="dialog">
+        <div class="journal-book guide-book">
+          <div class="journal-paper guide-paper">
+            <div class="journal-heading">
+              <div>
+                <p class="eyebrow">your sky adventure field guide</p>
+                <h2 id="howto-title">How to Play <span aria-hidden="true">☁</span></h2>
+              </div>
+              <button class="close-button" id="howto-close" type="button" aria-label="Close how to play">×</button>
+            </div>
+            <section class="guide-section" aria-labelledby="guide-controls-title">
+              <h3 id="guide-controls-title">Controls</h3>
+              <div class="guide-grid">
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">⌨️</span><div><h4>Move</h4><p>W A S D or arrow keys</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🐇</span><div><h4>Jump</h4><p>Space, or tap the jump button</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">💨</span><div><h4>Run</h4><p>Hold Shift while moving</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🖱️</span><div><h4>Look around</h4><p>Drag to turn the camera</p></div></article>
+              </div>
+            </section>
+            <section class="guide-section" aria-labelledby="guide-course-title">
+              <h3 id="guide-course-title">Platforms &amp; obstacles</h3>
+              <div class="guide-grid">
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">☁️</span><div><h4>Cloud platform</h4><p>Land or walk onto solid clouds. Step off an edge and you’ll fall.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🪞</span><div><h4>Glass bridge</h4><p>One cloud in each pair is solid; the two look exactly alike.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🌫️</span><div><h4>Fading cloud</h4><p>It blinks for 2.5 seconds, disappears briefly, then returns.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🍯</span><div><h4>Honey puddle</h4><p>Sticky paws slow Bunny down for a few seconds.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🧶</span><div><h4>Rolling yarn</h4><p>A tumble briefly stuns Bunny. Time a jump to avoid it.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🌬️</span><div><h4>Wind gust</h4><p>Gusts push Bunny sideways while Bunny is in the air.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🌸</span><div><h4>Bounce flower</h4><p>Step on one for a springy, extra-high launch.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🪨</span><div><h4>Cloud boulder</h4><p>Rolling boulders bump Bunny. Jump over them.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">↔️</span><div><h4>Moving cloud</h4><p>Ride the shuttle and lift clouds, then leap to the still landing clouds.</p></div></article>
+              </div>
+            </section>
+            <section class="guide-section" aria-labelledby="guide-scrapbook-title">
+              <h3 id="guide-scrapbook-title">Scrapbook finds</h3>
+              <div class="guide-grid guide-collectibles">
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">✦</span><div><h4>Wish Star</h4><p>A little skyward treasure.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">✿</span><div><h4>Cloud Blossom</h4><p>A flower for the scrapbook.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">羽</span><div><h4>Feather</h4><p>A keepsake from a passing friend.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🌈</span><div><h4>Rainbow</h4><p>A tiny piece of sunshine.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🥕</span><div><h4>Carrot pile</h4><p>Reach it to finish the level.</p></div></article>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <footer class="footer-note"><span>✿</span> take your time, little bunny <span>✿</span></footer>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
