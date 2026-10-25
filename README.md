@@ -12,6 +12,6 @@ Stars, blossoms, a feather, and a rainbow pin fill out the scrapbook. Honey slow
 
 1. Make the repository public in **Settings → General → Danger Zone → Change repository visibility**.
 2. In **Settings → Pages**, choose **GitHub Actions** as the build and deployment source.
-3. Open **Actions → Deploy GitHub Pages → Run workflow**.
+3. Push a change to `main`, or open **Actions → Deploy GitHub Pages → Run workflow** to publish manually.
 
 The published site URL is `https://n0t-krisha.github.io/floppy-sky-hop/`.
