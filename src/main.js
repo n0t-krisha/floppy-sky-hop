@@ -354,10 +354,10 @@ function makeStar() {
 }
 
 const itemDefinitions = [
-  { id: 'star', name: 'Wish Star', icon: '✦', description: 'A little wish from above.', positions: [[-1.4, -3.5], [.4, -8.5], [1.7, -13.6], [-1.5, -23.5], [1.5, -33.1], [-1.7, -42.9]] },
-  { id: 'blossom', name: 'Cloud Blossom', icon: '✿', description: 'A flower that loves the sky.', positions: [[.4, -8.5, -.8], [.1, -28.3, .7]] },
+  { id: 'star', name: 'Star', icon: '✦', description: 'A little wish from above.', positions: [[-1.4, -3.5], [.4, -8.5], [1.7, -13.6], [-1.5, -23.5], [1.5, -33.1], [-1.7, -42.9]] },
+  { id: 'blossom', name: 'Cherry Blossom', icon: '🌸', description: 'A flower that loves the sky.', positions: [[.4, -8.5, -.8], [.1, -28.3, .7]] },
   { id: 'feather', name: 'Bird Feather', icon: '羽', description: 'Left by a passing friend.', positions: [[.1, -18.7]] },
-  { id: 'rainbow', name: 'Rainbow Pin', icon: '🌈', description: 'A tiny piece of sunshine.', positions: [[-1.7, -42.9, .8]] },
+  { id: 'rainbow', name: 'Rainbow', icon: '🌈', description: 'A tiny piece of sunshine.', positions: [[-1.7, -42.9, .8]] },
   { id: 'shield', name: 'Bubble Shield', icon: '🫧', description: 'Blocks one obstacle hit.', positions: [[0, -13.6, .9]] },
   { id: 'rocket', name: 'Carrot Rocket', icon: '🥕🚀', description: 'Jump higher for 10 seconds.', positions: [[0, -28.3, -.9]] },
 ];
@@ -885,7 +885,7 @@ function renderJournal() {
     const card = document.createElement('article');
     card.className = `collection-card${collection.has(item.id) ? ' discovered' : ''}`;
     const illustration = item.id === 'rocket'
-      ? '<span class="carrot-rocket-icon"><span class="carrot-rocket-flame"></span><span class="carrot-rocket-fin carrot-rocket-fin-left"></span><span class="carrot-rocket-fin carrot-rocket-fin-right"></span><span class="carrot-rocket-body">🥕</span><span class="carrot-rocket-glint">✦</span></span>'
+      ? '<span class="carrot-rocket-icon"><span class="carrot-rocket-shell">🚀</span><span class="carrot-rocket-body">🥕</span></span>'
       : item.icon;
     card.innerHTML = `<span class="collection-check" aria-label="collected">✓</span><div class="collection-illustration" aria-hidden="true">${illustration}</div><h3 class="collection-name">${item.name}</h3><p class="collection-description">${collection.has(item.id) ? item.description : 'a little mystery…'}</p>`;
     ui.collectionGrid.append(card);

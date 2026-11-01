@@ -111,13 +111,9 @@ kbd { margin-left: 3px; padding: 1px 4px; border: 1px solid #e9e4d8; border-radi
 .collection-card:nth-child(3n + 2) { transform: rotate(.6deg); }
 .collection-illustration { width: 54px; height: 53px; margin: 0 auto 2px; display: grid; place-items: center; border-radius: 50%; background: #f8efdc; font-size: 31px; filter: saturate(.82); }
 .carrot-rocket-icon { position: relative; display: block; width: 42px; height: 42px; }
-.carrot-rocket-body { position: absolute; z-index: 1; top: 5px; left: 7px; font-size: 29px; line-height: 1; transform: rotate(-42deg); }
-.carrot-rocket-flame { position: absolute; right: 0; bottom: 1px; color: #e88655; font-size: 15px; line-height: 1; transform: rotate(38deg); }
-.carrot-rocket-flame::before { content: '🔥'; }
-.carrot-rocket-fin { position: absolute; z-index: 2; width: 0; height: 0; border-top: 7px solid #df9160; border-left: 5px solid transparent; border-right: 5px solid transparent; }
-.carrot-rocket-fin-left { left: 5px; top: 24px; transform: rotate(-35deg); }
-.carrot-rocket-fin-right { left: 27px; top: 4px; transform: rotate(145deg); }
-.carrot-rocket-glint { position: absolute; z-index: 2; top: 4px; right: 5px; color: #fffaf0; font-size: 10px; }
+.carrot-rocket-shell { position: absolute; inset: 3px 0 0; display: grid; place-items: center; font-size: 34px; line-height: 1; transform: rotate(-38deg); }
+.carrot-rocket-body { position: absolute; z-index: 1; top: 13px; left: 12px; font-size: 18px; line-height: 1; transform: rotate(-38deg); }
+.carrot-rocket-guide { transform: scale(.9); }
 .collection-card:nth-child(4n + 2) .collection-illustration { background: #f8e7e9; }
 .collection-card:nth-child(4n + 3) .collection-illustration { background: #e9f4f4; }
 .collection-card:nth-child(4n + 4) .collection-illustration { background: #f2effa; }
