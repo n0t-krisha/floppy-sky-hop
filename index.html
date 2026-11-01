@@ -35,8 +35,8 @@
         </div>
       </header>
 
-      <div class="chapter-tag" aria-hidden="true"><span class="chapter-sparkle">✧</span> little cloud trail</div>
-      <div class="ambient-label" aria-hidden="true"><span class="ambient-dot"></span><span id="status-label">a lovely day for a hop</span></div>
+      <div class="best-score" aria-live="polite">best level <span id="best-level">--</span></div>
+      <div class="ambient-label" aria-hidden="true"><span class="ambient-dot"></span><span id="status-label"></span></div>
       <div class="youtube-player" id="music-player" aria-label="Background music player">
         <iframe title="Sky Jumper background music" src="https://www.youtube-nocookie.com/embed/MgJve3aLsvk?enablejsapi=1&amp;autoplay=0&amp;controls=1&amp;loop=1&amp;playlist=MgJve3aLsvk&amp;playsinline=1&amp;rel=0" allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
       </div>
@@ -57,7 +57,6 @@
           <span class="card-sticker sticker-star" aria-hidden="true">✧</span>
           <div class="title-kicker"><span>✦</span> a tiny sky adventure <span>✦</span></div>
           <h1 id="title-heading">Sky <span>Jumper</span></h1>
-          <p>One little bunny. A sky full of wishes.</p>
           <div class="title-doodle" aria-hidden="true"><span>☁</span><i></i><span>☁</span></div>
           <button class="primary-button" id="start-button" type="button"><span>start hopping</span><span aria-hidden="true">↗</span></button>
           <span class="control-hint">move <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> <span class="hint-separator">·</span> hop <kbd>space</kbd> <span class="hint-separator">·</span> run <kbd>shift</kbd> <span class="hint-separator">·</span> drag to look</span>
@@ -134,6 +133,8 @@
                 <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🌸</span><div><h4>Bounce flower</h4><p>Step on one for a springy, extra-high launch.</p></div></article>
                 <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🪨</span><div><h4>Cloud boulder</h4><p>Rolling boulders bump Bunny. Jump over them.</p></div></article>
                 <article class="guide-entry"><span class="guide-picture" aria-hidden="true">↔️</span><div><h4>Moving cloud</h4><p>Ride the shuttle and lift clouds, then leap to the still landing clouds.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🫧</span><div><h4>Bubble shield</h4><p>Blocks one hit from honey, yarn, a boulder, or a gust.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🥕🚀</span><div><h4>Carrot rocket</h4><p>Jump higher for 10 seconds after collecting it.</p></div></article>
               </div>
             </section>
             <section class="guide-section" aria-labelledby="guide-scrapbook-title">
@@ -144,6 +145,8 @@
                 <article class="guide-entry"><span class="guide-picture" aria-hidden="true">羽</span><div><h4>Feather</h4><p>A keepsake from a passing friend.</p></div></article>
                 <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🌈</span><div><h4>Rainbow</h4><p>A tiny piece of sunshine.</p></div></article>
                 <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🥕</span><div><h4>Carrot pile</h4><p>Reach it to finish the level.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🫧</span><div><h4>Bubble Shield</h4><p>A one-hit protective power-up.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🥕🚀</span><div><h4>Carrot Rocket</h4><p>A temporary jump boost.</p></div></article>
               </div>
             </section>
           </div>
@@ -151,7 +154,6 @@
       </section>
 
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
-      <footer class="footer-note"><span>✿</span> take your time, little bunny <span>✿</span></footer>
     </main>
     <script type="module" src="/src/main.js"></script>
   </body>

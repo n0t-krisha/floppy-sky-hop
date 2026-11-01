@@ -317,6 +317,29 @@ const bunnyHalfHeight = .54;
 const startCloud = routeClouds[0];
 bunny.position.set(startCloud.x, startCloud.top + startCloud.group.position.y + bunnyHalfHeight, startCloud.z + 1.15);
 
+const shieldVisual = new THREE.Group();
+const shieldShell = new THREE.Mesh(
+  new THREE.SphereGeometry(1, 24, 18),
+  new THREE.MeshPhysicalMaterial({ color: '#d4f6fc', transparent: true, opacity: .2, roughness: .06, clearcoat: 1, clearcoatRoughness: .035, side: THREE.DoubleSide, depthWrite: false }),
+);
+shieldShell.scale.set(1.05, 1.38, .98);
+shieldVisual.add(shieldShell);
+const shieldShine = new THREE.Mesh(
+  new THREE.SphereGeometry(.12, 10, 8),
+  new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .82, depthWrite: false }),
+);
+shieldShine.position.set(.34, .55, -.88);
+shieldShine.scale.set(.55, 1.35, .25);
+shieldVisual.add(shieldShine);
+const shieldArc = new THREE.Mesh(
+  new THREE.TorusGeometry(.83, .018, 5, 40, Math.PI * 1.1),
+  new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: .45, depthWrite: false }),
+);
+shieldArc.rotation.set(.85, .18, -.42);
+shieldVisual.add(shieldArc);
+shieldVisual.visible = false;
+scene.add(shieldVisual);
+
 function makeStar() {
   const group = new THREE.Group();
   const material = new THREE.MeshStandardMaterial({ color: '#ffdf85', emissive: '#e9aa44', emissiveIntensity: .52, flatShading: true });
@@ -335,6 +358,8 @@ const itemDefinitions = [
   { id: 'blossom', name: 'Cloud Blossom', icon: '✿', description: 'A flower that loves the sky.', positions: [[.4, -8.5, -.8], [.1, -28.3, .7]] },
   { id: 'feather', name: 'Bird Feather', icon: '羽', description: 'Left by a passing friend.', positions: [[.1, -18.7]] },
   { id: 'rainbow', name: 'Rainbow Pin', icon: '🌈', description: 'A tiny piece of sunshine.', positions: [[-1.7, -42.9, .8]] },
+  { id: 'shield', name: 'Bubble Shield', icon: '🫧', description: 'Blocks one obstacle hit.', positions: [[0, -13.6, .9]] },
+  { id: 'rocket', name: 'Carrot Rocket', icon: '🥕🚀', description: 'Jump higher for 10 seconds.', positions: [[0, -28.3, -.9]] },
 ];
 const firstLevelItems = itemDefinitions.map(item => item.positions.map(([x, z, offsetX = 0]) => [x, z, offsetX]));
 for (let levelIndex = 1; levelIndex < LEVEL_COUNT; levelIndex += 1) {
@@ -366,6 +391,22 @@ for (const definition of itemDefinitions) {
         center.rotation.z = -.55;
         center.scale.set(.11, .33, .05);
         for (let barb = -2; barb <= 2; barb += 1) box(root, mats.cloudShade, barb * .055, barb * .06, -.03, .1, .035, .03).rotation.z = -.45;
+      } else if (definition.id === 'shield') {
+        const bubble = new THREE.Mesh(
+          new THREE.SphereGeometry(.31, 12, 10),
+          new THREE.MeshPhysicalMaterial({ color: '#c8f4fb', transparent: true, opacity: .48, roughness: .04, clearcoat: 1, depthWrite: false }),
+        );
+        root.add(bubble);
+        sphere(root, mats.cloud, .13, .14, -.22, .055, .08, .035, 0);
+      } else if (definition.id === 'rocket') {
+        const carrot = new THREE.Mesh(new THREE.ConeGeometry(.18, .62, 6), mats.yarnPink);
+        carrot.rotation.z = Math.PI - .35;
+        carrot.position.y = -.02;
+        root.add(carrot);
+        for (let leaf = -1; leaf <= 1; leaf += 1) {
+          box(root, mats.green, .08 + leaf * .07, .32, 0, .07, .22, .055).rotation.z = -.25 + leaf * .28;
+        }
+        sphere(root, mats.honeyLight, -.19, -.27, 0, .08, .1, .07, 0);
       } else {
         const charm = new THREE.Mesh(new THREE.TorusGeometry(.21, .055, 3, 8, Math.PI), mats.yarnBlue);
         charm.position.z = -.05;
@@ -462,7 +503,7 @@ function makeWindGust(cloud, offsetX, offsetZ, direction) {
     root.add(ring);
   }
   scene.add(root);
-  return { root, cloud, offsetX, offsetZ, direction, phase: 0 };
+  return { root, cloud, offsetX, offsetZ, direction, phase: 0, shieldBlocked: false };
 }
 
 function makeCloudBoulder(cloud, direction = 1) {
@@ -665,6 +706,9 @@ let yarnStunTimer = 0;
 let toastTimer = 0;
 let runTime = 0;
 let currentLevel = 1;
+let bestLevel = 0;
+let bubbleCharges = 0;
+let rocketBoostTimer = 0;
 let guideReturnState = 'title';
 let newlyDiscovered = false;
 let audioContext;
@@ -672,6 +716,9 @@ let masterGain;
 let audioMuted = false;
 let animationFrameId = 0;
 let displayedPage = 0;
+try {
+  bestLevel = Math.min(LEVEL_COUNT, Math.max(0, Number(localStorage.getItem('sky-jumper-best-level')) || 0));
+} catch {}
 const keys = new Set();
 const particles = [];
 const particlePalette = ['#fff4ce', '#f6c3d1', '#c9e8f4', '#d6e6b8'].map(color => new THREE.Color(color));
@@ -703,12 +750,14 @@ const ui = {
   retryLabel: document.querySelector('#retry-label'),
   starCount: document.querySelector('#star-count'),
   pageCount: document.querySelector('#page-count'),
+  bestLevel: document.querySelector('#best-level'),
   statusLabel: document.querySelector('#status-label'),
   toast: document.querySelector('#toast'),
   journalDot: document.querySelector('#journal-dot'),
   journalProgress: document.querySelector('#journal-progress'),
   collectionGrid: document.querySelector('#collection-grid'),
 };
+ui.bestLevel.textContent = bestLevel ? String(bestLevel).padStart(2, '0') : '--';
 
 function ensureAudio() {
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -766,6 +815,15 @@ function updatePauseButton() {
   ui.pauseButton.firstElementChild.textContent = paused ? '▶' : 'Ⅱ';
 }
 
+function recordBestLevel(level) {
+  if (level <= bestLevel) return;
+  bestLevel = level;
+  ui.bestLevel.textContent = String(bestLevel).padStart(2, '0');
+  try {
+    localStorage.setItem('sky-jumper-best-level', String(bestLevel));
+  } catch {}
+}
+
 function togglePause() {
   if (gameState === 'playing') {
     gameState = 'paused';
@@ -816,6 +874,8 @@ const journalItems = [
   { id: 'rainbow', name: 'Rainbow', icon: '🌈', description: 'A tiny piece of sunshine.' },
   { id: 'honey', name: 'Honey Puddle', icon: '🍯', description: 'Sticky, sweet, and rather slow.' },
   { id: 'yarn', name: 'Yarn Ball', icon: '🧶', description: 'A tumble with a soft landing.' },
+  { id: 'shield', name: 'Bubble Shield', icon: '🫧', description: 'A one-hit bubble of protection.' },
+  { id: 'rocket', name: 'Carrot Rocket', icon: '🥕🚀', description: 'Higher jumps for 10 seconds.' },
   { id: 'carrot', name: 'Carrot Pile', icon: '🥕', description: 'The loveliest skyward reward.' },
 ];
 
@@ -845,6 +905,15 @@ function showToast(message) {
   ui.toast.textContent = message;
   ui.toast.classList.add('visible');
   toastTimer = 2;
+}
+
+function popBubbleShield() {
+  if (bubbleCharges <= 0) return false;
+  bubbleCharges = 0;
+  shieldVisual.visible = false;
+  emitSparkles(bunny.position.clone().add(new THREE.Vector3(0, .7, 0)), 18);
+  showToast('Bubble shield popped and blocked the hit! 🫧');
+  return true;
 }
 
 function emitSparkles(position, count = 17) {
@@ -904,6 +973,7 @@ function setLevel(level) {
   scene.fog.color.set(theme.fog);
   ui.pageCount.innerHTML = `${String(currentLevel).padStart(2, '0')} <span>/ ${LEVEL_COUNT}</span>`;
   displayedPage = currentLevel;
+  recordBestLevel(currentLevel);
 }
 
 function restartLevel(level, resetAllHazards = false) {
@@ -912,6 +982,9 @@ function restartLevel(level, resetAllHazards = false) {
   const stageNumber = stageIndex + 1;
   slowTimer = 0;
   yarnStunTimer = 0;
+  bubbleCharges = 0;
+  rocketBoostTimer = 0;
+  shieldVisual.visible = false;
   collectedStars = 0;
   pickedThisRun = new Set();
   runTime = 0;
@@ -998,7 +1071,7 @@ function resetGame() {
   runTime = 0;
   keys.clear();
   ui.starCount.textContent = '0';
-  ui.statusLabel.textContent = 'a lovely day for a hop';
+  ui.statusLabel.textContent = '';
   ui.resultCard.classList.remove('won');
   for (const pickup of pickups) {
     pickup.active = true;
@@ -1033,6 +1106,10 @@ function updatePhysics(delta) {
   const oldY = bunny.position.y;
   const stunned = yarnStunTimer > 0;
   const movingSlow = slowTimer > 0;
+  if (rocketBoostTimer > 0) {
+    rocketBoostTimer = Math.max(0, rocketBoostTimer - delta);
+    if (rocketBoostTimer === 0) showToast('Carrot rocket power faded ✨');
+  }
   let forward = Number(keys.has('ArrowUp') || keys.has('KeyW')) - Number(keys.has('ArrowDown') || keys.has('KeyS'));
   let sideways = Number(keys.has('ArrowRight') || keys.has('KeyD')) - Number(keys.has('ArrowLeft') || keys.has('KeyA'));
   const sprinting = keys.has('ShiftLeft') || keys.has('ShiftRight');
@@ -1056,7 +1133,7 @@ function updatePhysics(delta) {
     }
     bunny.userData.body.rotation.z = THREE.MathUtils.damp(bunny.userData.body.rotation.z, -sideways * .12, 9, delta);
     if (keys.has('Space') && grounded && gameState === 'playing') {
-      verticalSpeed = 9.2;
+      verticalSpeed = rocketBoostTimer > 0 ? 12.1 : 9.2;
       grounded = false;
       keys.delete('Space');
       playHopSound();
@@ -1112,8 +1189,10 @@ function updatePhysics(delta) {
       bunny.rotation.z = 0;
       showToast('Back on your paws! ✧');
     }
+  } else if (rocketBoostTimer > 0) {
+    ui.statusLabel.textContent = `carrot rocket · ${Math.ceil(rocketBoostTimer)}s`;
   } else if (gameState === 'playing') {
-    ui.statusLabel.textContent = movingSlow ? 'sticky paws' : 'a lovely day for a hop';
+    ui.statusLabel.textContent = movingSlow ? 'sticky paws' : '';
   }
 
   for (const hazard of hazards) {
@@ -1147,23 +1226,29 @@ function updatePhysics(delta) {
     }
     const hazardCloud = hazard.cloud;
     const heightTolerance = hazard.type === 'boulder' ? .95 : .62;
-    if (!grounded || stunned || Math.abs(bunny.position.y - (hazardCloud.top + hazardCloud.group.position.y + bunnyHalfHeight)) > heightTolerance) continue;
-    if (Math.abs(bunny.position.x - hazard.x) < (hazard.radiusX || (hazard.type === 'boulder' ? .95 : .8)) && Math.abs(bunny.position.z - hazard.z) < (hazard.radiusZ || (hazard.type === 'boulder' ? .95 : .8))) {
-      if (hazard.type === 'honey' && slowTimer <= 0) {
+    const touchingHazard = Math.abs(bunny.position.y - (hazardCloud.top + hazardCloud.group.position.y + bunnyHalfHeight)) <= heightTolerance
+      && Math.abs(bunny.position.x - hazard.x) < (hazard.radiusX || (hazard.type === 'boulder' ? .95 : .8))
+      && Math.abs(bunny.position.z - hazard.z) < (hazard.radiusZ || (hazard.type === 'boulder' ? .95 : .8));
+    if (!touchingHazard) hazard.shieldBlocked = false;
+    if (!grounded || stunned || !touchingHazard || hazard.shieldBlocked) continue;
+    if (popBubbleShield()) {
+      hazard.shieldBlocked = true;
+      continue;
+    }
+    if (hazard.type === 'honey' && slowTimer <= 0) {
         slowTimer = 5;
         addCollection('honey');
         showToast('Sticky honey paws! Slow for 5 seconds 🍯');
-      } else if (hazard.type === 'yarn' && yarnStunTimer <= 0) {
+    } else if (hazard.type === 'yarn' && yarnStunTimer <= 0) {
         yarnStunTimer = 3;
         addCollection('yarn');
         showToast('A yarny tumble! Just 3 seconds 🧶');
-      } else if (hazard.type === 'boulder' && hazard.hitCooldown <= 0) {
+    } else if (hazard.type === 'boulder' && hazard.hitCooldown <= 0) {
         bunny.position.x = THREE.MathUtils.clamp(bunny.position.x + Math.sign(bunny.position.x - hazard.x || hazard.direction) * 1.15, -4.9, 4.9);
         verticalSpeed = 5.6;
         grounded = false;
         hazard.hitCooldown = .9;
         showToast('Cloud boulder! Hop over it next time ☁');
-      }
     }
   }
 
@@ -1172,8 +1257,11 @@ function updatePhysics(delta) {
     const dz = bunny.position.z - wind.root.position.z;
     const nearPlatformHeight = Math.abs(bunny.position.y - (wind.cloud.top + wind.cloud.group.position.y + bunnyHalfHeight)) < 2.2;
     const gusting = Math.sin(runTime * 2.4 + wind.phase) > -.2;
-    if (!grounded && !stunned && gusting && nearPlatformHeight && Math.abs(dx) < 2.4 && Math.abs(dz) < 1.8) {
-      bunny.position.x = THREE.MathUtils.clamp(bunny.position.x + wind.direction * 2.4 * delta, -4.9, 4.9);
+    const insideGust = !stunned && gusting && nearPlatformHeight && Math.abs(dx) < 2.4 && Math.abs(dz) < 1.8;
+    if (!insideGust) wind.shieldBlocked = false;
+    if (!grounded && insideGust && !wind.shieldBlocked) {
+      if (popBubbleShield()) wind.shieldBlocked = true;
+      else bunny.position.x = THREE.MathUtils.clamp(bunny.position.x + wind.direction * 2.4 * delta, -4.9, 4.9);
     }
   }
 
@@ -1204,7 +1292,12 @@ function updatePhysics(delta) {
       pickup.root.visible = false;
       pickedThisRun.add(pickup.root.uuid);
       const isNew = addCollection(pickup.id);
-      if (pickup.id === 'star') {
+      if (pickup.id === 'shield') {
+        bubbleCharges = 1;
+        shieldVisual.visible = true;
+      } else if (pickup.id === 'rocket') {
+        rocketBoostTimer = 10;
+      } else if (pickup.id === 'star') {
         collectedStars += 1;
         ui.starCount.textContent = String(collectedStars);
       }
@@ -1275,6 +1368,15 @@ function updateMovingPlatforms() {
 
 function updateScene(delta) {
   runTime += delta;
+  shieldVisual.visible = bubbleCharges > 0;
+  if (bubbleCharges > 0) {
+    shieldVisual.position.set(
+      bunny.position.x,
+      bunny.position.y + .2 + Math.sin(runTime * 2.2) * .045,
+      bunny.position.z,
+    );
+    shieldVisual.rotation.y = runTime * .28;
+  }
   for (const cloud of clouds) {
     const liftOffset = cloud.motion?.type === 'vertical' ? cloud.motionOffsetY || 0 : 0;
     cloud.group.position.y = cloud.y + Math.sin(runTime * 1.05 + cloud.floatOffset) * .055 + liftOffset;
