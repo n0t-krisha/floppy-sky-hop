@@ -868,8 +868,8 @@ function toggleAudio() {
 }
 
 const journalItems = [
-  { id: 'star', name: 'Wish Star', icon: '✦', description: 'A little wish from above.' },
-  { id: 'blossom', name: 'Cloud Blossom', icon: '✿', description: 'A flower that loves the sky.' },
+  { id: 'star', name: 'Star', icon: '✦', description: 'A little wish from above.' },
+  { id: 'blossom', name: 'Cherry Blossom', icon: '🌸', description: 'A flower that loves the sky.' },
   { id: 'feather', name: 'Feather', icon: '羽', description: 'Left by a passing friend.' },
   { id: 'rainbow', name: 'Rainbow', icon: '🌈', description: 'A tiny piece of sunshine.' },
   { id: 'honey', name: 'Honey Puddle', icon: '🍯', description: 'Sticky, sweet, and rather slow.' },
@@ -884,7 +884,10 @@ function renderJournal() {
   for (const item of journalItems) {
     const card = document.createElement('article');
     card.className = `collection-card${collection.has(item.id) ? ' discovered' : ''}`;
-    card.innerHTML = `<span class="collection-check" aria-label="collected">✓</span><div class="collection-illustration" aria-hidden="true">${item.icon}</div><h3 class="collection-name">${item.name}</h3><p class="collection-description">${collection.has(item.id) ? item.description : 'a little mystery…'}</p>`;
+    const illustration = item.id === 'rocket'
+      ? '<span class="carrot-rocket-icon"><span class="carrot-rocket-flame"></span><span class="carrot-rocket-fin carrot-rocket-fin-left"></span><span class="carrot-rocket-fin carrot-rocket-fin-right"></span><span class="carrot-rocket-body">🥕</span><span class="carrot-rocket-glint">✦</span></span>'
+      : item.icon;
+    card.innerHTML = `<span class="collection-check" aria-label="collected">✓</span><div class="collection-illustration" aria-hidden="true">${illustration}</div><h3 class="collection-name">${item.name}</h3><p class="collection-description">${collection.has(item.id) ? item.description : 'a little mystery…'}</p>`;
     ui.collectionGrid.append(card);
   }
   ui.journalProgress.textContent = `${collection.size} of ${journalItems.length} found　✧`;
