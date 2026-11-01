@@ -135,7 +135,7 @@ const LEVEL_TYPES = Array.from({ length: LEVEL_COUNT }, (_, levelIndex) => {
 });
 const LEVEL_FEATURES = Array.from({ length: LEVEL_COUNT }, (_, levelIndex) => ({
   wind: levelIndex >= 2 && levelIndex % 2 === 0,
-  fading: levelIndex >= 2 && levelIndex % 4 === 2,
+  fading: levelIndex >= 2 && levelIndex % 4 === 2 && levelIndex !== 6,
   bounce: levelIndex % 4 === 0,
   boulders: levelIndex >= 4 && levelIndex % 5 === 4,
   moving: levelIndex === 5,
