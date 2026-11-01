@@ -27,6 +27,7 @@
           <button class="icon-button" id="pause-toggle" type="button" disabled aria-label="Pause game" aria-pressed="false" title="Pause game"><span aria-hidden="true">Ⅱ</span></button>
           <button class="icon-button" id="howto-open" type="button" aria-label="How to play" title="How to play"><span aria-hidden="true">?</span></button>
           <button class="icon-button sound-button" id="sound-toggle" type="button" aria-label="Mute music and sound effects" aria-pressed="false" title="Mute music and sound effects"><span id="sound-icon" aria-hidden="true">♫</span></button>
+          <button class="icon-button" id="shop-open" type="button" aria-label="Open star shop" title="Star shop"><span aria-hidden="true">🛍️</span></button>
           <button class="journal-button" id="journal-open" type="button" aria-label="Open collection journal" title="Open collection journal">
             <span aria-hidden="true">▤</span>
             <span class="journal-button-label">journal</span>
@@ -102,6 +103,23 @@
         </div>
       </section>
 
+      <section class="journal-overlay hidden" id="shop-screen" aria-labelledby="shop-title" aria-modal="true" role="dialog">
+        <div class="journal-book shop-book">
+          <div class="journal-paper shop-paper">
+            <div class="journal-heading">
+              <div>
+                <p class="eyebrow">a little cloudside boutique</p>
+                <h2 id="shop-title">Star Shop <span aria-hidden="true">✦</span></h2>
+              </div>
+              <button class="close-button" id="shop-close" type="button" aria-label="Close star shop">×</button>
+            </div>
+            <div class="shop-balance">Your stars <strong><span id="shop-balance">0</span> ✦</strong></div>
+            <div class="shop-grid" id="shop-grid"></div>
+            <div class="journal-footer"><span>your stars stay saved</span><span>choose a new look ✧</span></div>
+          </div>
+        </div>
+      </section>
+
       <section class="journal-overlay hidden" id="howto-screen" aria-labelledby="howto-title" aria-modal="true" role="dialog">
         <div class="journal-book guide-book">
           <div class="journal-paper guide-paper">
@@ -146,7 +164,7 @@
                 <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🌈</span><div><h4>Rainbow</h4><p>A tiny piece of sunshine.</p></div></article>
                 <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🥕</span><div><h4>Carrot pile</h4><p>Reach it to finish the level.</p></div></article>
                 <article class="guide-entry"><span class="guide-picture" aria-hidden="true">🫧</span><div><h4>Bubble Shield</h4><p>A one-hit protective power-up.</p></div></article>
-                <article class="guide-entry"><span class="guide-picture" aria-hidden="true"><span class="carrot-rocket-icon carrot-rocket-guide"><span class="carrot-rocket-shell">🚀</span><span class="carrot-rocket-body">🥕</span></span></span><div><h4>Carrot Rocket</h4><p>A temporary jump boost.</p></div></article>
+                <article class="guide-entry"><span class="guide-picture" aria-hidden="true"><span class="carrot-rocket-icon"><span class="carrot-rocket-flame"></span><span class="carrot-rocket-fin carrot-rocket-fin-left"></span><span class="carrot-rocket-fin carrot-rocket-fin-right"></span><span class="carrot-rocket-body"><span class="carrot-rocket-window"></span><span class="carrot-rocket-stripe"></span></span><span class="carrot-rocket-leaf carrot-rocket-leaf-left"></span><span class="carrot-rocket-leaf carrot-rocket-leaf-right"></span></span></span><div><h4>Carrot Rocket</h4><p>A temporary jump boost.</p></div></article>
               </div>
             </section>
           </div>

@@ -111,9 +111,16 @@ kbd { margin-left: 3px; padding: 1px 4px; border: 1px solid #e9e4d8; border-radi
 .collection-card:nth-child(3n + 2) { transform: rotate(.6deg); }
 .collection-illustration { width: 54px; height: 53px; margin: 0 auto 2px; display: grid; place-items: center; border-radius: 50%; background: #f8efdc; font-size: 31px; filter: saturate(.82); }
 .carrot-rocket-icon { position: relative; display: block; width: 42px; height: 42px; }
-.carrot-rocket-shell { position: absolute; inset: 3px 0 0; display: grid; place-items: center; font-size: 34px; line-height: 1; transform: rotate(-38deg); }
-.carrot-rocket-body { position: absolute; z-index: 1; top: 13px; left: 12px; font-size: 18px; line-height: 1; transform: rotate(-38deg); }
-.carrot-rocket-guide { transform: scale(.9); }
+.carrot-rocket-body { position: absolute; z-index: 1; top: 5px; left: 13px; width: 16px; height: 25px; border-radius: 55% 55% 3px 3px; background: #f3944e; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.carrot-rocket-window { position: absolute; top: 10px; left: 5px; width: 6px; height: 6px; border: 1px solid #fff9e8; border-radius: 50%; background: #82c9de; }
+.carrot-rocket-stripe { position: absolute; top: 17px; right: 3px; width: 2px; height: 6px; border-radius: 2px; background: #ffd18b; transform: rotate(-15deg); }
+.carrot-rocket-fin { position: absolute; z-index: 2; top: 22px; width: 8px; height: 9px; background: #df8961; clip-path: polygon(0 0, 100% 35%, 100% 100%); }
+.carrot-rocket-fin-left { left: 7px; transform: rotate(-20deg); }
+.carrot-rocket-fin-right { right: 7px; transform: scaleX(-1) rotate(-20deg); }
+.carrot-rocket-leaf { position: absolute; z-index: 3; top: 27px; width: 8px; height: 12px; border-radius: 90% 15% 80% 15%; background: #92b878; }
+.carrot-rocket-leaf-left { left: 13px; transform: rotate(-30deg); }
+.carrot-rocket-leaf-right { right: 12px; transform: rotate(65deg); }
+.carrot-rocket-flame { position: absolute; top: 31px; left: 18px; width: 8px; height: 11px; background: #f5bb68; clip-path: polygon(20% 0, 80% 0, 50% 100%); }
 .collection-card:nth-child(4n + 2) .collection-illustration { background: #f8e7e9; }
 .collection-card:nth-child(4n + 3) .collection-illustration { background: #e9f4f4; }
 .collection-card:nth-child(4n + 4) .collection-illustration { background: #f2effa; }
@@ -138,6 +145,19 @@ kbd { margin-left: 3px; padding: 1px 4px; border: 1px solid #e9e4d8; border-radi
 .guide-collectibles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .guide-collectibles .guide-entry { align-items: flex-start; }
 .guide-collectibles .guide-picture { flex-basis: 38px; width: 38px; height: 38px; }
+.shop-book { width: min(820px, 100%); }
+.shop-paper { max-height: calc(100dvh - 70px); }
+.shop-balance { display: flex; justify-content: space-between; align-items: center; margin: 13px 0 8px; color: #849996; font: 11px 'DM Mono', monospace; }
+.shop-balance strong { color: #bc8e46; font-size: 13px; }
+.shop-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.shop-skin-card { min-width: 0; padding: 9px; border: 1px solid #eee3d1; border-radius: 6px; background: rgba(255,255,255,.62); text-align: center; }
+.shop-skin-preview { height: 72px; display: grid; place-items: center; border-radius: 5px; background: #eef5f2; font-size: 47px; }
+.shop-skin-card:nth-child(3n + 2) .shop-skin-preview { background: #fae9ed; }
+.shop-skin-card:nth-child(3n + 3) .shop-skin-preview { background: #f7efd9; }
+.shop-skin-card h3 { margin: 7px 0 2px; color: #587487; font: 17px 'Patrick Hand', cursive; }
+.shop-skin-card p { min-height: 28px; margin: 0 0 7px; color: #929d98; font: 12px/1.2 'Patrick Hand', cursive; }
+.shop-skin-card .primary-button { min-height: 35px; padding: 0 7px; border-radius: 8px; font-size: 11px; }
+.shop-skin-card .primary-button:disabled { border-bottom-color: #b6c8bd; background: #b8cfc4; cursor: default; opacity: .8; }
 .paper-tape { position: absolute; z-index: 1; width: 46px; height: 12px; top: 6px; background: rgba(236,206,169,.55); }
 .tape-left { left: 62px; transform: rotate(-9deg); }
 .tape-right { right: 28px; transform: rotate(7deg); }
@@ -175,6 +195,10 @@ kbd { margin-left: 3px; padding: 1px 4px; border: 1px solid #e9e4d8; border-radi
   .guide-paper { max-height: calc(100dvh - 38px); padding: 21px 12px 15px 31px; }
   .guide-grid, .guide-collectibles { grid-template-columns: minmax(0, 1fr); }
   .guide-section { margin-top: 15px; }
+  .shop-paper { max-height: calc(100dvh - 38px); padding: 21px 12px 15px 31px; }
+  .shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .shop-skin-card { padding: 7px; }
+  .shop-skin-preview { height: 58px; font-size: 38px; }
 }
 
 @media (hover: none) and (pointer: coarse) {

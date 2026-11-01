@@ -290,24 +290,82 @@ for (let index = 0; index < route.length; index += 1) {
 function makeBunny() {
   const bunny = new THREE.Group();
   const body = new THREE.Group();
+  const skinMaterials = {
+    fur: mats.beige.clone(),
+    light: mats.beigeLight.clone(),
+    dark: mats.beigeDark.clone(),
+    accent: mats.pink.clone(),
+    ink: mats.ink.clone(),
+    patch: mats.ink.clone(),
+    beak: new THREE.MeshStandardMaterial({ color: '#eba34e', roughness: .8, flatShading: true }),
+    tear: new THREE.MeshBasicMaterial({ color: '#8ecde5' }),
+    glint: new THREE.MeshBasicMaterial({ color: '#fffefa' }),
+  };
   bunny.add(body);
-  sphere(body, mats.beige, 0, -.12, .01, .38, .34, .34, 1);
-  sphere(body, mats.beigeLight, 0, -.18, -.3, .26, .24, .13, 0);
-  sphere(body, mats.beigeLight, 0, .35, -.19, .36, .34, .32, 1);
-  const leftEar = box(body, mats.beigeLight, -.22, .77, -.18, .18, .58, .16);
-  const rightEar = box(body, mats.beigeLight, .22, .77, -.18, .18, .58, .16);
-  box(body, mats.pink, -.22, .78, -.271, .09, .39, .025);
-  box(body, mats.pink, .22, .78, -.271, .09, .39, .025);
-  sphere(body, mats.pink, -.315, .25, -.438, .075, .045, .025, 0);
-  sphere(body, mats.pink, .315, .25, -.438, .075, .045, .025, 0);
-  sphere(body, mats.ink, -.115, .39, -.482, .045, .055, .025, 0);
-  sphere(body, mats.ink, .115, .39, -.482, .045, .055, .025, 0);
-  sphere(body, mats.pink, 0, .27, -.495, .055, .045, .025, 0);
-  box(body, mats.beigeDark, -.19, -.43, -.1, .23, .13, .29);
-  box(body, mats.beigeDark, .19, -.43, -.1, .23, .13, .29);
+  const furParts = [
+    sphere(body, skinMaterials.fur, 0, -.12, .01, .38, .34, .34, 1),
+    sphere(body, skinMaterials.light, 0, -.18, -.3, .26, .24, .13, 0),
+    sphere(body, skinMaterials.light, 0, .35, -.19, .36, .34, .32, 1),
+  ];
+  const leftEar = box(body, skinMaterials.light, -.22, .77, -.18, .18, .58, .16);
+  const rightEar = box(body, skinMaterials.light, .22, .77, -.18, .18, .58, .16);
+  const leftInnerEar = box(body, skinMaterials.accent, -.22, .78, -.271, .09, .39, .025);
+  const rightInnerEar = box(body, skinMaterials.accent, .22, .78, -.271, .09, .39, .025);
+  const cheeks = [
+    sphere(body, skinMaterials.accent, -.315, .25, -.438, .075, .045, .025, 0),
+    sphere(body, skinMaterials.accent, .315, .25, -.438, .075, .045, .025, 0),
+  ];
+  const eyes = [
+    sphere(body, skinMaterials.ink, -.115, .39, -.482, .045, .055, .025, 0),
+    sphere(body, skinMaterials.ink, .115, .39, -.482, .045, .055, .025, 0),
+  ];
+  sphere(body, skinMaterials.accent, 0, .27, -.495, .055, .045, .025, 0);
+  box(body, skinMaterials.dark, -.19, -.43, -.1, .23, .13, .29);
+  box(body, skinMaterials.dark, .19, -.43, -.1, .23, .13, .29);
   sphere(body, mats.cloud, 0, -.1, .36, .13, .13, .13, 0);
+
+  const accessories = new THREE.Group();
+  const pandaMask = new THREE.Group();
+  for (const eyeX of [-.115, .115]) {
+    const patch = new THREE.Mesh(new THREE.TorusGeometry(.078, .025, 5, 16), skinMaterials.patch);
+    patch.position.set(eyeX, .39, -.515);
+    pandaMask.add(patch);
+  }
+  const swanNeck = sphere(accessories, skinMaterials.light, 0, .63, -.14, .14, .38, .15, 1);
+  const swanBeak = new THREE.Mesh(new THREE.ConeGeometry(.12, .25, 5), skinMaterials.beak);
+  swanBeak.rotation.x = -Math.PI / 2;
+  swanBeak.position.set(0, .28, -.51);
+  accessories.add(swanBeak);
+  const quokkaCheeks = new THREE.Group();
+  for (const cheekX of [-.28, .28]) sphere(quokkaCheeks, skinMaterials.light, cheekX, .22, -.4, .16, .12, .075, 0);
+  const hamsterTears = new THREE.Group();
+  const hamsterGlints = new THREE.Group();
+  for (const eyeX of [-.115, .115]) {
+    sphere(hamsterTears, skinMaterials.tear, eyeX, .29, -.507, .025, .06, .015, 0);
+    sphere(hamsterGlints, skinMaterials.glint, eyeX - .018, .415, -.515, .018, .022, .012, 0);
+  }
+  const hamsterBow = new THREE.Group();
+  box(hamsterBow, skinMaterials.accent, -.1, .12, 0, .2, .15, .06).rotation.z = -.45;
+  box(hamsterBow, skinMaterials.accent, .1, .12, 0, .2, .15, .06).rotation.z = .45;
+  box(hamsterBow, skinMaterials.dark, 0, .12, -.04, .08, .08, .07);
+  hamsterBow.position.set(.2, .67, -.49);
+  accessories.add(pandaMask, quokkaCheeks, hamsterTears, hamsterGlints, hamsterBow);
+  body.add(accessories);
+  pandaMask.visible = false;
+  swanNeck.visible = false;
+  swanBeak.visible = false;
+  quokkaCheeks.visible = false;
+  hamsterTears.visible = false;
+  hamsterGlints.visible = false;
+  hamsterBow.visible = false;
   bunny.userData.body = body;
   bunny.userData.ears = [leftEar, rightEar];
+  bunny.userData.innerEars = [leftInnerEar, rightInnerEar];
+  bunny.userData.furParts = furParts;
+  bunny.userData.cheeks = cheeks;
+  bunny.userData.eyes = eyes;
+  bunny.userData.skinMaterials = skinMaterials;
+  bunny.userData.skinAccessories = { pandaMask, swanNeck, swanBeak, quokkaCheeks, hamsterTears, hamsterGlints, hamsterBow };
   scene.add(bunny);
   return bunny;
 }
@@ -340,6 +398,58 @@ shieldVisual.add(shieldArc);
 shieldVisual.visible = false;
 scene.add(shieldVisual);
 
+const SHOP_SKINS = [
+  { id: 'bunny', name: 'Cloud Bunny', emoji: '🐰', price: 0, fur: '#dcbf99', light: '#eddbbf', dark: '#bd9b78', accent: '#ecabbc', earScale: 1 },
+  { id: 'panda', name: 'Panda', emoji: '🐼', price: 15, fur: '#f5f3ed', light: '#fffefa', dark: '#292b34', accent: '#e8a9b5', earScale: 1, features: ['pandaMask'] },
+  { id: 'hare', name: 'Hare', emoji: '🐇', price: 22, fur: '#c4a27b', light: '#ead8bc', dark: '#866b4d', accent: '#d99bab', earScale: 1.55 },
+  { id: 'swan', name: 'Swan', emoji: '🦢', price: 32, fur: '#f7f8f5', light: '#ffffff', dark: '#e6e9ed', accent: '#efb1bc', earScale: 0, features: ['swanNeck', 'swanBeak'] },
+  { id: 'quokka', name: 'Quokka', emoji: '🐿️', price: 38, fur: '#b98763', light: '#f0d7b6', dark: '#80563d', accent: '#d895a4', earScale: .75, features: ['quokkaCheeks'] },
+  { id: 'shy-hamster', name: 'Shy Hamster', emoji: '🐹🎀', secret: true, price: 0, fur: '#898681', light: '#d8d5d0', dark: '#39383a', accent: '#e996b2', earScale: .62, features: ['hamsterTears', 'hamsterGlints', 'hamsterBow'], eyeScale: 1.65 },
+];
+function loadOwnedSkins() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('sky-jumper-owned-skins') || '[]');
+    return new Set(['bunny', ...saved.filter(id => SHOP_SKINS.some(skin => skin.id === id))]);
+  } catch {
+    return new Set(['bunny']);
+  }
+}
+const ownedSkinIds = loadOwnedSkins();
+let equippedSkinId = 'bunny';
+try {
+  const savedSkin = localStorage.getItem('sky-jumper-equipped-skin');
+  if (ownedSkinIds.has(savedSkin)) equippedSkinId = savedSkin;
+} catch {}
+
+function saveSkinState() {
+  try {
+    localStorage.setItem('sky-jumper-owned-skins', JSON.stringify([...ownedSkinIds]));
+    localStorage.setItem('sky-jumper-equipped-skin', equippedSkinId);
+  } catch {}
+}
+
+function applySkin(skinId) {
+  const skin = SHOP_SKINS.find(item => item.id === skinId) || SHOP_SKINS[0];
+  const materials = bunny.userData.skinMaterials;
+  materials.fur.color.set(skin.fur);
+  materials.light.color.set(skin.light);
+  materials.dark.color.set(skin.dark);
+  materials.accent.color.set(skin.accent);
+  materials.patch.color.set(skin.dark);
+  for (const ear of [...bunny.userData.ears, ...bunny.userData.innerEars]) {
+    ear.visible = skin.earScale > 0;
+    ear.scale.y = skin.earScale;
+  }
+  for (const cheek of bunny.userData.cheeks) cheek.visible = skin.id === 'bunny' || skin.id === 'shy-hamster';
+  for (const eye of bunny.userData.eyes) eye.scale.set(.045 * (skin.eyeScale || 1), .055 * (skin.eyeScale || 1), .025);
+  for (const [feature, object] of Object.entries(bunny.userData.skinAccessories)) {
+    object.visible = Boolean(skin.features?.includes(feature));
+  }
+  equippedSkinId = skin.id;
+  bunny.userData.skinId = skin.id;
+  saveSkinState();
+}
+
 function makeStar() {
   const group = new THREE.Group();
   const material = new THREE.MeshStandardMaterial({ color: '#ffdf85', emissive: '#e9aa44', emissiveIntensity: .52, flatShading: true });
@@ -358,6 +468,7 @@ const itemDefinitions = [
   { id: 'blossom', name: 'Cherry Blossom', icon: '🌸', description: 'A flower that loves the sky.', positions: [[.4, -8.5, -.8], [.1, -28.3, .7]] },
   { id: 'feather', name: 'Bird Feather', icon: '羽', description: 'Left by a passing friend.', positions: [[.1, -18.7]] },
   { id: 'rainbow', name: 'Rainbow', icon: '🌈', description: 'A tiny piece of sunshine.', positions: [[-1.7, -42.9, .8]] },
+  { id: 'bow', name: 'Ribbon Bow', icon: '🎀', description: 'A tiny ribbon with a secret sparkle.', positions: [[1.2, -47.8]] },
   { id: 'shield', name: 'Bubble Shield', icon: '🫧', description: 'Blocks one obstacle hit.', positions: [[0, -13.6, .9]] },
   { id: 'rocket', name: 'Carrot Rocket', icon: '🥕🚀', description: 'Jump higher for 10 seconds.', positions: [[0, -28.3, -.9]] },
 ];
@@ -391,6 +502,18 @@ for (const definition of itemDefinitions) {
         center.rotation.z = -.55;
         center.scale.set(.11, .33, .05);
         for (let barb = -2; barb <= 2; barb += 1) box(root, mats.cloudShade, barb * .055, barb * .06, -.03, .1, .035, .03).rotation.z = -.45;
+      } else if (definition.id === 'bow') {
+        center.visible = false;
+        const leftLoop = new THREE.Mesh(new THREE.TorusGeometry(.13, .045, 4, 9), mats.pink);
+        leftLoop.scale.set(1, .72, .6);
+        leftLoop.rotation.z = -.38;
+        leftLoop.position.x = -.12;
+        root.add(leftLoop);
+        const rightLoop = leftLoop.clone();
+        rightLoop.rotation.z = .38;
+        rightLoop.position.x = .12;
+        root.add(rightLoop);
+        sphere(root, mats.honeyLight, 0, 0, -.06, .08, .08, .06, 0);
       } else if (definition.id === 'shield') {
         const bubble = new THREE.Mesh(
           new THREE.SphereGeometry(.31, 12, 10),
@@ -696,7 +819,14 @@ for (let ray = 0; ray < 10; ray += 1) {
 }
 
 const collection = new Set();
-let collectedStars = 0;
+function loadStarBalance() {
+  try {
+    return Math.max(0, Number(localStorage.getItem('sky-jumper-star-balance')) || 0);
+  } catch {
+    return 0;
+  }
+}
+let starBalance = loadStarBalance();
 let pickedThisRun = new Set();
 let gameState = 'title';
 let grounded = true;
@@ -710,6 +840,8 @@ let bestLevel = 0;
 let bubbleCharges = 0;
 let rocketBoostTimer = 0;
 let guideReturnState = 'title';
+let shopReturnState = 'title';
+let bowCollectedThisRun = false;
 let newlyDiscovered = false;
 let audioContext;
 let masterGain;
@@ -749,6 +881,11 @@ const ui = {
   resultKicker: document.querySelector('#result-kicker'),
   retryLabel: document.querySelector('#retry-label'),
   starCount: document.querySelector('#star-count'),
+  shopOpen: document.querySelector('#shop-open'),
+  shopScreen: document.querySelector('#shop-screen'),
+  shopClose: document.querySelector('#shop-close'),
+  shopBalance: document.querySelector('#shop-balance'),
+  shopGrid: document.querySelector('#shop-grid'),
   pageCount: document.querySelector('#page-count'),
   bestLevel: document.querySelector('#best-level'),
   statusLabel: document.querySelector('#status-label'),
@@ -758,6 +895,15 @@ const ui = {
   collectionGrid: document.querySelector('#collection-grid'),
 };
 ui.bestLevel.textContent = bestLevel ? String(bestLevel).padStart(2, '0') : '--';
+ui.starCount.textContent = String(starBalance);
+applySkin(equippedSkinId);
+renderShop();
+
+function saveStarBalance() {
+  try {
+    localStorage.setItem('sky-jumper-star-balance', String(starBalance));
+  } catch {}
+}
 
 function ensureAudio() {
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -804,6 +950,28 @@ function playHopSound() {
     tone.disconnect();
     envelope.disconnect();
   }, { once: true });
+}
+
+function playSecretUnlockJingle() {
+  if (audioMuted || !audioContext || !masterGain) return;
+  const start = audioContext.currentTime;
+  for (const [frequency, offset] of [[659, 0], [784, .14], [988, .28], [1318, .46]]) {
+    const tone = audioContext.createOscillator();
+    const envelope = audioContext.createGain();
+    tone.type = 'triangle';
+    tone.frequency.setValueAtTime(frequency, start + offset);
+    envelope.gain.setValueAtTime(.0001, start + offset);
+    envelope.gain.exponentialRampToValueAtTime(.12, start + offset + .025);
+    envelope.gain.exponentialRampToValueAtTime(.0001, start + offset + .2);
+    tone.connect(envelope);
+    envelope.connect(masterGain);
+    tone.start(start + offset);
+    tone.stop(start + offset + .21);
+    tone.addEventListener('ended', () => {
+      tone.disconnect();
+      envelope.disconnect();
+    }, { once: true });
+  }
 }
 
 function updatePauseButton() {
@@ -872,6 +1040,7 @@ const journalItems = [
   { id: 'blossom', name: 'Cherry Blossom', icon: '🌸', description: 'A flower that loves the sky.' },
   { id: 'feather', name: 'Feather', icon: '羽', description: 'Left by a passing friend.' },
   { id: 'rainbow', name: 'Rainbow', icon: '🌈', description: 'A tiny piece of sunshine.' },
+  { id: 'bow', name: 'Ribbon Bow', icon: '🎀', description: 'A tiny ribbon with a secret sparkle.' },
   { id: 'honey', name: 'Honey Puddle', icon: '🍯', description: 'Sticky, sweet, and rather slow.' },
   { id: 'yarn', name: 'Yarn Ball', icon: '🧶', description: 'A tumble with a soft landing.' },
   { id: 'shield', name: 'Bubble Shield', icon: '🫧', description: 'A one-hit bubble of protection.' },
@@ -885,7 +1054,7 @@ function renderJournal() {
     const card = document.createElement('article');
     card.className = `collection-card${collection.has(item.id) ? ' discovered' : ''}`;
     const illustration = item.id === 'rocket'
-      ? '<span class="carrot-rocket-icon"><span class="carrot-rocket-shell">🚀</span><span class="carrot-rocket-body">🥕</span></span>'
+      ? '<span class="carrot-rocket-icon"><span class="carrot-rocket-flame"></span><span class="carrot-rocket-fin carrot-rocket-fin-left"></span><span class="carrot-rocket-fin carrot-rocket-fin-right"></span><span class="carrot-rocket-body"><span class="carrot-rocket-window"></span><span class="carrot-rocket-stripe"></span></span><span class="carrot-rocket-leaf carrot-rocket-leaf-left"></span><span class="carrot-rocket-leaf carrot-rocket-leaf-right"></span></span>'
       : item.icon;
     card.innerHTML = `<span class="collection-check" aria-label="collected">✓</span><div class="collection-illustration" aria-hidden="true">${illustration}</div><h3 class="collection-name">${item.name}</h3><p class="collection-description">${collection.has(item.id) ? item.description : 'a little mystery…'}</p>`;
     ui.collectionGrid.append(card);
@@ -902,6 +1071,35 @@ function addCollection(id) {
     renderJournal();
   }
   return isNew;
+}
+
+function renderShop() {
+  ui.shopGrid.replaceChildren();
+  ui.shopBalance.textContent = String(starBalance);
+  for (const skin of SHOP_SKINS) {
+    const owned = ownedSkinIds.has(skin.id);
+    if (skin.secret && !owned) continue;
+    const equipped = equippedSkinId === skin.id;
+    const card = document.createElement('article');
+    card.className = 'shop-skin-card';
+    const action = equipped ? 'Wearing' : owned ? 'Wear' : `Buy · ${skin.price} ✦`;
+    card.innerHTML = `<div class="shop-skin-preview" aria-hidden="true">${skin.emoji}</div><h3>${skin.name}</h3><p>${skin.secret ? 'A very shy new friend.' : skin.id === 'bunny' ? 'Your original cloud-hopping look.' : 'A fresh look for the next adventure.'}</p><button class="primary-button" type="button" data-skin-id="${skin.id}" ${equipped || (!owned && starBalance < skin.price) ? 'disabled' : ''}>${action}</button>`;
+    ui.shopGrid.append(card);
+  }
+  ui.starCount.textContent = String(starBalance);
+}
+
+function chooseShopSkin(skinId) {
+  const skin = SHOP_SKINS.find(item => item.id === skinId);
+  if (!skin || (skin.secret && !ownedSkinIds.has(skinId))) return;
+  if (!ownedSkinIds.has(skinId)) {
+    if (starBalance < skin.price) return;
+    starBalance -= skin.price;
+    ownedSkinIds.add(skinId);
+    saveStarBalance();
+  }
+  applySkin(skinId);
+  renderShop();
 }
 
 function showToast(message) {
@@ -952,6 +1150,13 @@ function showResult(win) {
     addCollection('carrot');
     emitSparkles(carrotPiles[stageIndexFor(currentLevel)].position.clone().add(new THREE.Vector3(0, 1.5, 0)), 52);
   } else {
+    if (bowCollectedThisRun && !ownedSkinIds.has('shy-hamster')) {
+      ownedSkinIds.add('shy-hamster');
+      saveSkinState();
+      renderShop();
+      playSecretUnlockJingle();
+      showToast('A shy new friend joined the shop! 🐹🎀');
+    }
     ui.resultKicker.textContent = 'a little skyward detour';
     ui.resultTitle.textContent = 'oops!';
     ui.resultCopy.textContent = 'Bunny fell into the sky';
@@ -988,11 +1193,10 @@ function restartLevel(level, resetAllHazards = false) {
   bubbleCharges = 0;
   rocketBoostTimer = 0;
   shieldVisual.visible = false;
-  collectedStars = 0;
   pickedThisRun = new Set();
   runTime = 0;
   keys.clear();
-  ui.starCount.textContent = '0';
+  ui.starCount.textContent = String(starBalance);
   ui.statusLabel.textContent = `level ${currentLevel} · a fresh hop ✧`;
   for (const pickup of pickups.filter(item => item.level === stageNumber)) {
     pickup.active = true;
@@ -1057,6 +1261,7 @@ function resetGame() {
   ui.pauseScreen.classList.add('hidden');
   document.querySelector('#game').classList.remove('paused');
   currentLevel = 1;
+  bowCollectedThisRun = false;
   const startPlatform = routeClouds[0];
   bunny.position.set(startPlatform.x, startPlatform.top + startPlatform.group.position.y + bunnyHalfHeight, startPlatform.z + 1.15);
   bunny.rotation.set(0, 0, 0);
@@ -1069,11 +1274,10 @@ function resetGame() {
   displayedPage = 1;
   slowTimer = 0;
   yarnStunTimer = 0;
-  collectedStars = 0;
   pickedThisRun = new Set();
   runTime = 0;
   keys.clear();
-  ui.starCount.textContent = '0';
+  ui.starCount.textContent = String(starBalance);
   ui.statusLabel.textContent = '';
   ui.resultCard.classList.remove('won');
   for (const pickup of pickups) {
@@ -1300,9 +1504,12 @@ function updatePhysics(delta) {
         shieldVisual.visible = true;
       } else if (pickup.id === 'rocket') {
         rocketBoostTimer = 10;
+      } else if (pickup.id === 'bow') {
+        bowCollectedThisRun = true;
       } else if (pickup.id === 'star') {
-        collectedStars += 1;
-        ui.starCount.textContent = String(collectedStars);
+        starBalance += 1;
+        ui.starCount.textContent = String(starBalance);
+        saveStarBalance();
       }
       emitSparkles(pickup.root.position, 12);
       showToast(isNew ? `${pickup.name} added to your scrapbook! ✧` : `${pickup.name} collected! ✧`);
@@ -1532,6 +1739,33 @@ function closeJournal() {
   ui.journalScreen.classList.add('hidden');
 }
 
+function openShop() {
+  shopReturnState = gameState;
+  if (gameState === 'playing') {
+    gameState = 'paused';
+    keys.clear();
+    ui.pauseScreen.classList.remove('hidden');
+    document.querySelector('#game').classList.add('paused');
+    setMusicPaused(true);
+    updatePauseButton();
+  }
+  renderShop();
+  ui.shopScreen.classList.remove('hidden');
+}
+
+function closeShop() {
+  ui.shopScreen.classList.add('hidden');
+  if (shopReturnState === 'playing') {
+    gameState = 'playing';
+    keys.clear();
+    ui.pauseScreen.classList.add('hidden');
+    document.querySelector('#game').classList.remove('paused');
+    setMusicPaused(false);
+    updatePauseButton();
+    startAnimationLoop();
+  }
+}
+
 function openHowTo() {
   guideReturnState = gameState;
   if (gameState === 'playing') {
@@ -1587,6 +1821,15 @@ document.querySelector('#howto-close').addEventListener('click', closeHowTo);
 ui.howToScreen.addEventListener('click', event => {
   if (event.target === ui.howToScreen) closeHowTo();
 });
+ui.shopOpen.addEventListener('click', openShop);
+ui.shopClose.addEventListener('click', closeShop);
+ui.shopScreen.addEventListener('click', event => {
+  if (event.target === ui.shopScreen) closeShop();
+});
+ui.shopGrid.addEventListener('click', event => {
+  const button = event.target.closest('[data-skin-id]');
+  if (button) chooseShopSkin(button.dataset.skinId);
+});
 document.querySelector('.brand').addEventListener('click', event => {
   event.preventDefault();
   if (gameState !== 'playing') {
@@ -1599,6 +1842,7 @@ addEventListener('keydown', event => {
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(event.code)) event.preventDefault();
   if (event.code === 'Escape') {
     if (!ui.journalScreen.classList.contains('hidden')) closeJournal();
+    else if (!ui.shopScreen.classList.contains('hidden')) closeShop();
     else if (!ui.howToScreen.classList.contains('hidden')) closeHowTo();
     else if (gameState === 'playing' || gameState === 'paused') togglePause();
     return;
